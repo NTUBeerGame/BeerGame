@@ -127,7 +127,8 @@ export function toProfessorModel(d) {
     roleStatuses: g.roles.map((r) => ({
       roleId: r.role,
       roleName: ROLE_INFO[r.role].name,
-      student: r.nickname ?? '（自動）',
+      student: r.nickname ?? '（電腦）',
+      isAuto: r.controller !== 'human',
       submitted: r.submitted || r.controller !== 'human',
       orderPlaced: r.pendingOrder?.order ?? null,
       shipPlaced: r.pendingOrder?.ship ?? null,
@@ -145,6 +146,9 @@ export function toProfessorModel(d) {
     joinCode: d.class.joinCode,
     totalWeeks: d.class.totalWeeks,
     pacing: d.class.pacing,
+    manualShipping: d.class.manualShipping,
+    holdingCost: holding,
+    backlogCost,
     // 全班進程：有任何一組還在決策就算「決策中」
     globalPhase: playing.some((g) => g.phase === 'decision') ? 'decision' : 'result',
     currentWeek: Math.max(0, ...groups.map((g) => g.week)),

@@ -210,7 +210,7 @@ test('adapter：API 回傳轉成皓婷元件的欄位', async () => {
   assert.equal(pm.globalPhase, 'decision');
   assert.equal(pm.allGroupsSubmitted, true);
   assert.equal(pm.groups[0].roleStatuses[0].orderPlaced, 6);
-  assert.equal(pm.groups[0].roleStatuses[1].student, '（自動）');
+  assert.equal(pm.groups[0].roleStatuses[1].student, '（電腦）');
 
   ok(await call(action, { method: 'POST', token: T, body: { action: 'resolve' } }));
   m = toGameViewModel(ok(await call(getState, { token: A.token })));

@@ -61,3 +61,145 @@ input:focus, select:focus {
   cursor: not-allowed;
   opacity: 0.6;
 }
+/* ── 串接後端新增的共用樣式 ── */
+.info-banner,
+.warn-banner,
+.error-banner {
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  text-align: left;
+}
+.info-banner {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid #3b82f6;
+  color: #bfdbfe;
+}
+.info-banner.success {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+  color: #a7f3d0;
+}
+.warn-banner {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--primary);
+  color: #fde68a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.error-banner {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--danger);
+  color: #fca5a5;
+}
+.token-code {
+  display: block;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #0b1120;
+  border-radius: 6px;
+  font-family: ui-monospace, Consolas, monospace;
+  word-break: break-all;
+  user-select: all;
+}
+.link-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #93c5fd;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* 登入頁：學生／老師切換 */
+.mode-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+.mode-tabs button {
+  flex: 1;
+  background: #0b1120;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+.mode-tabs button.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+}
+.login-switch {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+.login-switch button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+/* 大廳 */
+.lobby-hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* 遊戲：決策表單 */
+.decision-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.label-hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: normal;
+  margin-top: 0.2rem;
+}
+
+/* 教授主控台 */
+.prof-header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.join-code-line {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+.join-code {
+  font-size: 1.6rem;
+  letter-spacing: 0.15em;
+  color: var(--primary);
+  font-family: ui-monospace, Consolas, monospace;
+}
+.weeks-total {
+  font-weight: normal;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.banner-action {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+.secondary-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}

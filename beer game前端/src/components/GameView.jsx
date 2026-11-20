@@ -27,7 +27,7 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
   const [shipInput, setShipInput] = useState('');     // 給下游的出貨數量
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  // 5. 當期結算摘要與歷史紀錄
+  // 5. 當期結算摘要與歷史紀錄（新增 cumulativeMyPenalty 與 cumulativeGroupPenalty）
   const [lastSummary, setLastSummary] = useState(null);
   const [history, setHistory] = useState([
     {
@@ -39,7 +39,9 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
       backlog: 0,
       placedOrder: '-',
       myPenalty: -12,
-      groupPenalty: -48
+      cumulativeMyPenalty: -12,
+      groupPenalty: -48,
+      cumulativeGroupPenalty: -48
     }
   ]);
 
@@ -55,7 +57,7 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
   const availableStock = inventory + pipeline.arrivedNow;
   const totalDemand = incomingOrder + backlog;
 
-  // 學生提交本期雙重決策（僅限制出貨量不可超過現有可用存貨）
+  // 學生提交本期雙重決策
   const handleSubmitDecision = (e) => {
     e.preventDefault();
     const placed = parseInt(orderInput, 10);
@@ -82,7 +84,7 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
     const placed = parseInt(orderInput || '0', 10);
     const shippedQty = parseInt(shipInput || '0', 10);
 
-    // 1. 物理結算：超過下游需求時欠貨直接歸 0
+    // 1. 物理結算
     const newInventory = availableStock - shippedQty;
     const newBacklog = Math.max(0, totalDemand - shippedQty);
 
@@ -136,7 +138,9 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
         backlog: newBacklog,
         placedOrder: placed,
         myPenalty: roundMyPenalty,
-        groupPenalty: roundGroupPenalty
+        cumulativeMyPenalty: nextMyTotal,
+        groupPenalty: roundGroupPenalty,
+        cumulativeGroupPenalty: nextGroupTotal
       },
       ...prev
     ]);
@@ -228,13 +232,12 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
 
           {/* 雙欄位決策輸入區 */}
           <form className="order-form-panel" onSubmit={handleSubmitDecision}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
-              
+            <div className="dual-input-grid">
               {/* 欄位 1：給下游的出貨量 */}
               <div>
                 <label>
                   1. 決定給下游【{roleInfo.downstream}】的出貨量：
-                  <span style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', fontWeight: 'normal', marginTop: '0.2rem' }}>
+                  <span className="input-hint">
                     （可用存貨上限 {availableStock} 箱，下游當前需求 {totalDemand} 箱）
                   </span>
                 </label>
@@ -246,7 +249,6 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
                   value={shipInput}
                   disabled={hasSubmitted}
                   onChange={(e) => setShipInput(e.target.value)}
-                  style={{ width: '100%' }}
                 />
               </div>
 
@@ -254,7 +256,7 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
               <div>
                 <label>
                   2. 向上游【{roleInfo.upstream}】提出的訂貨量：
-                  <span style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', fontWeight: 'normal', marginTop: '0.2rem' }}>
+                  <span className="input-hint">
                     （訂購後需 2 期前置時間才會送達）
                   </span>
                 </label>
@@ -265,19 +267,16 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
                   value={orderInput}
                   disabled={hasSubmitted}
                   onChange={(e) => setOrderInput(e.target.value)}
-                  style={{ width: '100%' }}
                 />
               </div>
-
             </div>
 
             <button
               type="submit"
-              className="btn-primary"
-              style={{ width: '100%' }}
+              className="btn-primary full-width-btn"
               disabled={hasSubmitted || orderInput === '' || shipInput === ''}
             >
-              {hasSubmitted ? '✓ 已送出本期決策' : '提交本期決策'}
+              {hasSubmitted ? '✓ 已送出本期決策' : '提交本期雙重決策'}
             </button>
 
             {hasSubmitted && (
@@ -290,70 +289,86 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
         </div>
       )}
 
-      {/* ==================== Phase 2: 本輪結算結果頁面 ==================== */}
+      {/* ==================== Phase 2: 本輪結算結果頁面（橫向佈局） ==================== */}
       {phase === 'result' && lastSummary && (
         <div className="phase-card result-phase">
-          <div className="phase-badge result-badge">Phase 2：第 {lastSummary.week} 期 結算報告</div>
-
-          <div className="score-summary-grid">
-            <div className="score-card">
-              <span className="score-label">自己累計失分</span>
-              <strong className="score-val text-amber">{lastSummary.nextMyTotal} 分</strong>
-              <span className="score-diff">（本期變化：{lastSummary.roundMyPenalty} 分）</span>
-            </div>
-            <div className="score-card">
-              <span className="score-label">所屬組別累計失分</span>
-              <strong className="score-val text-red">{lastSummary.nextGroupTotal} 分</strong>
-              <span className="score-diff">（本期全組變化：{lastSummary.roundGroupPenalty} 分）</span>
-            </div>
+          <div className="phase-header-row">
+            <div className="phase-badge result-badge">Phase 2：第 {lastSummary.week} 期 結算報告</div>
+            <span className="waiting-inline-prompt">⌛ 請等待教授檢視全班進度並開啟下一期...</span>
           </div>
 
-          <h4 className="section-subtitle">📦 本期進出貨結算明細</h4>
-          <div className="result-details-grid">
-            <div className="result-item">
-              <span>客戶總需求 (本期+積欠)</span>
-              <strong>{lastSummary.totalDemand} 箱</strong>
+          {/* 橫向三欄結算大盤 */}
+          <div className="result-horizontal-board">
+            {/* 左欄：累計失分總覽 */}
+            <div className="result-col">
+              <h4 className="col-title">🏆 累計失分總覽</h4>
+              <div className="score-stack">
+                <div className="score-card">
+                  <span className="score-label">自己累計失分</span>
+                  <strong className="score-val text-amber">{lastSummary.nextMyTotal} 分</strong>
+                  <span className="score-diff">本期：{lastSummary.roundMyPenalty} 分</span>
+                </div>
+                <div className="score-card">
+                  <span className="score-label">所屬組別累計失分</span>
+                  <strong className="score-val text-red">{lastSummary.nextGroupTotal} 分</strong>
+                  <span className="score-diff">全組本期：{lastSummary.roundGroupPenalty} 分</span>
+                </div>
+              </div>
             </div>
-            <div className="result-item">
-              <span>本期實際出貨給下游</span>
-              <strong className="text-green">{lastSummary.shippedQty} 箱</strong>
-            </div>
-            <div className="result-item">
-              <span>期末剩餘存貨總量</span>
-              <strong className="text-green">{lastSummary.newInventory} 箱</strong>
-            </div>
-            <div className="result-item">
-              <span>延誤未按時抵達欠貨</span>
-              <strong className={lastSummary.newBacklog > 0 ? 'text-red' : ''}>
-                {lastSummary.newBacklog} 箱
-              </strong>
-            </div>
-          </div>
 
-          <div className="penalty-breakdown">
-            <h4>🎯 本期失分來源分析</h4>
-            <div className="breakdown-row">
-              <span>期末存貨扣分 ({lastSummary.newInventory} 箱 × -1)：</span>
-              <strong>{lastSummary.invPenalty} 分</strong>
+            {/* 中欄：進出貨結算明細 */}
+            <div className="result-col">
+              <h4 className="col-title">📦 本期進出貨結算</h4>
+              <div className="result-details-2x2">
+                <div className="result-item">
+                  <span>客戶總需求</span>
+                  <strong>{lastSummary.totalDemand} 箱</strong>
+                </div>
+                <div className="result-item">
+                  <span>實際給下游出貨</span>
+                  <strong className="text-green">{lastSummary.shippedQty} 箱</strong>
+                </div>
+                <div className="result-item">
+                  <span>期末剩餘存貨</span>
+                  <strong className="text-green">{lastSummary.newInventory} 箱</strong>
+                </div>
+                <div className="result-item">
+                  <span>未按時抵達欠貨</span>
+                  <strong className={lastSummary.newBacklog > 0 ? 'text-red' : ''}>
+                    {lastSummary.newBacklog} 箱
+                  </strong>
+                </div>
+              </div>
             </div>
-            <div className="breakdown-row">
-              <span>延誤欠貨扣分 ({lastSummary.newBacklog} 箱 × -2)：</span>
-              <strong>{lastSummary.delayPenalty} 分</strong>
-            </div>
-            <div className="breakdown-divider"></div>
-            <div className="breakdown-row highlight-row">
-              <span>自己本期失分總計：</span>
-              <strong className="text-amber">{lastSummary.roundMyPenalty} 分</strong>
-            </div>
-          </div>
 
-          <div className="waiting-next-prompt">
-            <span>⌛ 請等待教授檢視全班進度並開啟下一期...</span>
+            {/* 右欄：本期失分來源分析 */}
+            <div className="result-col">
+              <h4 className="col-title">🎯 本期失分來源</h4>
+              <div className="penalty-breakdown">
+                <div className="breakdown-row">
+                  <span>存貨扣分 ({lastSummary.newInventory} × -1)：</span>
+                  <strong>{lastSummary.invPenalty} 分</strong>
+                </div>
+                <div className="breakdown-row">
+                  <span>欠貨扣分 ({lastSummary.newBacklog} × -2)：</span>
+                  <strong>{lastSummary.delayPenalty} 分</strong>
+                </div>
+                <div className="breakdown-divider"></div>
+                <div className="breakdown-row highlight-row">
+                  <span>自己本期總計：</span>
+                  <strong className="text-amber">{lastSummary.roundMyPenalty} 分</strong>
+                </div>
+                <div className="breakdown-row">
+                  <span>組別本期總計：</span>
+                  <strong className="text-red">{lastSummary.roundGroupPenalty} 分</strong>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* 常駐歷史流水表 */}
+      {/* 常駐歷史流水表（新增累計失分欄位） */}
       <div className="history-section">
         <h3>📊 歷史營運與失分流水帳</h3>
         <div className="table-responsive">
@@ -367,8 +382,10 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
                 <th>期末存貨</th>
                 <th>欠貨積欠</th>
                 <th>向上游訂貨</th>
-                <th>自己失分</th>
-                <th>組別失分</th>
+                <th>自己本期失分</th>
+                <th>自己累計失分</th>
+                <th>組別本期失分</th>
+                <th>組別累計失分</th>
               </tr>
             </thead>
             <tbody>
@@ -382,7 +399,9 @@ export default function GameView({ currentUser, myRole, onExitGame }) {
                   <td className={row.backlog > 0 ? 'text-red' : ''}>{row.backlog}</td>
                   <td className="highlight-cell">{row.placedOrder}</td>
                   <td className="text-amber">{row.myPenalty}</td>
+                  <td className="text-amber"><strong>{row.cumulativeMyPenalty}</strong></td>
                   <td className="text-red">{row.groupPenalty}</td>
+                  <td className="text-red"><strong>{row.cumulativeGroupPenalty}</strong></td>
                 </tr>
               ))}
             </tbody>

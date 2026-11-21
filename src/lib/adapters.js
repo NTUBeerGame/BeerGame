@@ -87,7 +87,9 @@ export function toGameViewModel(s) {
       backlog: r.backlog,
       placedOrder: r.order,
       myPenalty: neg(r.weekCost),
+      cumulativeMyPenalty: neg(r.totalCost),
       groupPenalty: neg(r.groupWeekCost),
+      cumulativeGroupPenalty: neg(r.groupTotalCost),
     })),
   };
 }

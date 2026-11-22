@@ -6,13 +6,15 @@
 //   'resolve'  結算本期 → 學生跳到結果頁。
 //              預設只結算「全員都送出」的組；force: true 時沒送出的人自動代下。
 //   'nextWeek' 開啟下一期 → 學生回到決策輸入頁
+//   'end'      提前結束遊戲（學生不能再送出，但資料都還在，可以下載 CSV）
+//   'deleteClass' 永久刪除整個班級的所有資料，body 要帶 confirm: 班級代碼（防止誤刪）
 import { route, readBody, bearerToken, HttpError, check, isUuid } from '../_lib/http.js';
 import { db } from '../_lib/supabase.js';
 import { getClassByTeacherToken, tryAdvance } from '../_lib/game.js';
 
 export default route(['POST'], async (req) => {
   const cls = await getClassByTeacherToken(bearerToken(req));
-  const { action, gameId, force = false } = readBody(req);
+  const { action, gameId, force = false, confirm } = readBody(req);
   const sb = db();
   const now = () => new Date().toISOString();
 
@@ -59,6 +61,24 @@ export default route(['POST'], async (req) => {
           .in('id', ids).eq('phase', 'result').eq('status', 'playing'),
       );
       return { ok: true };
+    }
+    case 'end': {
+      check(
+        await sb.from('games').update({ status: 'finished', updated_at: now() })
+          .in('id', ids).in('status', ['waiting', 'playing', 'paused']),
+      );
+      return { ok: true };
+    }
+    case 'deleteClass': {
+      if (gameId) throw new HttpError(400, 'BAD_REQUEST', '刪除只能針對整個班級');
+      if (String(confirm ?? '').trim().toUpperCase() !== cls.join_code) {
+        throw new HttpError(400, 'CONFIRM_MISMATCH', '班級代碼不正確，沒有刪除任何資料');
+      }
+      // 先把所有組設為結束：還開著畫面的學生會透過 Realtime 收到通知
+      check(await sb.from('games').update({ status: 'finished', updated_at: now() }).eq('class_id', cls.id));
+      // 刪除班級；組別、座位、決策、每期紀錄都設了 on delete cascade，會一起刪掉
+      check(await sb.from('classes').delete().eq('id', cls.id));
+      return { ok: true, deleted: true };
     }
     default:
       throw new HttpError(400, 'BAD_REQUEST', `未知的 action：${action}`);

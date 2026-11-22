@@ -231,3 +231,37 @@ test('adapter：API 回傳轉成皓婷元件的欄位', async () => {
   assert.equal(pm.groups[0].roleStatuses[0].backlog, 2);
   assert.equal(pm.groups[0].groupPenalty, -54);
 });
+
+test('老師結束遊戲、刪除班級資料', async () => {
+  const cls = ok(await call(createClass, { method: 'POST', body: { name: '要刪的班', groups: 2, totalWeeks: 5 } }));
+  const T = cls.teacherToken;
+  const A = ok(await call(join, { method: 'POST', body: { code: cls.groups[0].code, nickname: '甲' } }));
+  ok(await call(action, { method: 'POST', token: T, body: { action: 'start' } }));
+  ok(await call(order, { method: 'POST', token: A.token, body: { week: 1, order: 4, ship: 4 } }));
+  ok(await call(action, { method: 'POST', token: T, body: { action: 'resolve' } }));
+
+  // 結束遊戲：學生不能再送出，但資料還在
+  ok(await call(action, { method: 'POST', token: T, body: { action: 'end' } }));
+  const s = ok(await call(getState, { token: A.token }));
+  assert.equal(s.game.status, 'finished');
+  assert.equal(s.history.length, 1);
+  fails(await call(order, { method: 'POST', token: A.token, body: { week: 2, order: 4, ship: 4 } }), 409, 'NOT_PLAYING');
+  const csv = await call(dashboard, { token: T, query: { format: 'csv' } });
+  assert.equal(csv.status, 200);
+
+  // 刪除：代碼錯誤不會刪
+  fails(await call(action, { method: 'POST', token: T, body: { action: 'deleteClass', confirm: 'WRONG1' } }), 400, 'CONFIRM_MISMATCH');
+  ok(await call(dashboard, { token: T }));
+
+  // 代碼正確 → 全部刪光
+  const gameIds = cls.groups.map((g) => g.gameId);
+  ok(await call(action, { method: 'POST', token: T, body: { action: 'deleteClass', confirm: cls.joinCode.toLowerCase() } }));
+  fails(await call(dashboard, { token: T }), 401, 'UNAUTHORIZED');
+  fails(await call(getState, { token: A.token }), 401, 'UNAUTHORIZED');
+  fails(await call(lobby, { query: { code: cls.joinCode } }), 404, 'CLASS_NOT_FOUND');
+  for (const t of ['games', 'game_states', 'seats', 'orders', 'round_records']) {
+    const col = t === 'games' ? 'id' : 'game_id';
+    const { rows } = await pg.query(`select count(*)::int as n from ${t} where ${col} = any($1)`, [gameIds]);
+    assert.equal(rows[0].n, 0, `${t} 應該清空`);
+  }
+});

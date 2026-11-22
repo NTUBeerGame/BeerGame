@@ -2,9 +2,10 @@ import { useState } from 'react';
 import './ProfessorView.css';
 import { useProfessor } from '../hooks/useProfessor.js';
 import { ROLE_INFO } from '../lib/adapters.js';
+import ClassAdminPanel from './ClassAdminPanel.jsx';
 
 export default function ProfessorView({ teacherToken, justCreated, onLogout }) {
-  const { model, error, loading, busy, start, pause, resolve, nextWeek, downloadCsv } = useProfessor(teacherToken);
+  const { model, error, loading, busy, start, pause, resolve, nextWeek, end, deleteClass, downloadCsv } = useProfessor(teacherToken);
   const [selectedGroupId, setSelectedGroupId] = useState(null);
   const [notReady, setNotReady] = useState(null); // 結算時還有人沒送出的組
   const [message, setMessage] = useState('');
@@ -220,6 +221,18 @@ export default function ProfessorView({ teacherToken, justCreated, onLogout }) {
           </table>
         </div>
       </div>
+
+      <ClassAdminPanel
+        joinCode={model.joinCode}
+        status={model.status}
+        busy={busy}
+        onEnd={end}
+        onDownloadCsv={() => act(() => downloadCsv())}
+        onDelete={async (code) => {
+          await deleteClass(code);
+          onLogout(); // 刪除後教師代碼失效，回到登入頁
+        }}
+      />
     </div>
   );
 }

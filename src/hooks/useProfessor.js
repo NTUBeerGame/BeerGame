@@ -66,6 +66,9 @@ export function useProfessor(teacherToken) {
     pause: (opts) => run('pause', opts),
     resolve: (opts) => run('resolve', opts),
     nextWeek: (opts) => run('nextWeek', opts),
+    end: () => run('end'),
+    // 刪除後教師代碼就失效了，所以不再重新讀取主控台
+    deleteClass: (joinCode) => api.teacherAction(teacherToken, 'deleteClass', { confirm: joinCode }),
     downloadCsv: () => api.downloadCsv(teacherToken),
   };
 }

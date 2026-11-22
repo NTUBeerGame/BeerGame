@@ -77,9 +77,21 @@ export default function LoginView({ onStudentLogin, onTeacherLogin }) {
     <div className="login-wrapper">
       <div className="login-card">
         <div className="login-header">
-          <span className="login-icon">🍺</span>
-          <h2>{mode === 'student' ? '登入啤酒遊戲' : '教師專區'}</h2>
-          <p>{mode === 'student' ? '進入供應鏈沙盒實驗室' : '開設班級、掌控全班遊戲進程'}</p>
+          <h2
+            style={
+              mode === 'student'
+                ? {
+                    fontFamily: "Georgia, 'Times New Roman', serif",
+                    fontSize: '2.35rem',
+                    fontStyle: 'italic',
+                    letterSpacing: '2px',
+                  }
+                : undefined
+            }
+          >
+            {mode === 'student' ? 'Beer Game' : '教師專區'}
+          </h2>
+          {mode !== 'student' && <p>開設班級、掌控全班遊戲進程</p>}
         </div>
 
         {mode !== 'student' && (
@@ -98,22 +110,20 @@ export default function LoginView({ onStudentLogin, onTeacherLogin }) {
         {mode === 'student' && (
           <form onSubmit={handleStudent} className="login-form">
             <div className="form-item">
-              <label htmlFor="nickname">玩家暱稱 / 學號</label>
+              <label htmlFor="nickname" style={{ textAlign: 'left' }}>玩家暱稱 / 學號</label>
               <input
                 id="nickname"
                 type="text"
-                placeholder="請輸入你的名字或學號"
                 maxLength={20}
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
               />
             </div>
             <div className="form-item">
-              <label htmlFor="joinCode">班級代碼</label>
+              <label htmlFor="joinCode" style={{ textAlign: 'left' }}>班級代碼</label>
               <input
                 id="joinCode"
                 type="text"
-                placeholder="老師提供的 6 碼代碼"
                 autoCapitalize="characters"
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
@@ -121,7 +131,7 @@ export default function LoginView({ onStudentLogin, onTeacherLogin }) {
               />
             </div>
             <button type="submit" className="btn-primary login-btn" disabled={busy}>
-              {busy ? '確認中…' : '進入大廳'}
+              {busy ? '確認中…' : '進入遊戲'}
             </button>
           </form>
         )}
@@ -129,20 +139,20 @@ export default function LoginView({ onStudentLogin, onTeacherLogin }) {
         {mode === 'create' && (
           <form onSubmit={handleCreate} className="login-form">
             <div className="form-item">
-              <label htmlFor="className">班級名稱</label>
+              <label htmlFor="className" style={{ textAlign: 'left' }}>班級名稱</label>
               <input id="className" type="text" placeholder="例如：作業管理 115-1" maxLength={60}
                 value={className} onChange={(e) => setClassName(e.target.value)} />
             </div>
             <div className="form-item">
-              <label htmlFor="groups">組數</label>
+              <label htmlFor="groups" style={{ textAlign: 'left' }}>組數</label>
               <input id="groups" type="number" min="1" max="30" value={groups} onChange={(e) => setGroups(e.target.value)} />
             </div>
             <div className="form-item">
-              <label htmlFor="totalWeeks">總期數（學生看不到）</label>
+              <label htmlFor="totalWeeks" style={{ textAlign: 'left' }}>總期數（學生看不到）</label>
               <input id="totalWeeks" type="number" min="1" max="100" value={totalWeeks} onChange={(e) => setTotalWeeks(e.target.value)} />
             </div>
             <div className="form-item">
-              <label htmlFor="secret">開班密碼（沒有設定就留空）</label>
+              <label htmlFor="secret" style={{ textAlign: 'left' }}>開班密碼（沒有設定就留空）</label>
               <input id="secret" type="password" value={secret} onChange={(e) => setSecret(e.target.value)} />
             </div>
             <button type="submit" className="btn-primary login-btn" disabled={busy}>
@@ -154,7 +164,7 @@ export default function LoginView({ onStudentLogin, onTeacherLogin }) {
         {mode === 'resume' && (
           <form onSubmit={handleResume} className="login-form">
             <div className="form-item">
-              <label htmlFor="teacherToken">教師代碼</label>
+              <label htmlFor="teacherToken" style={{ textAlign: 'left' }}>教師代碼</label>
               <input id="teacherToken" type="text" placeholder="開班時拿到的一長串代碼"
                 value={teacherToken} onChange={(e) => setTeacherToken(e.target.value)} />
             </div>

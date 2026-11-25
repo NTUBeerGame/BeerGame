@@ -132,6 +132,23 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
         </div>
 
         <div className="lobby-select-row">
+          <label htmlFor="group-select">組別：</label>
+          <select
+            id="group-select"
+            value={group.id}
+            onChange={(e) => setSelectedGroupId(e.target.value)}
+            disabled={busy}
+          >
+            {model.groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.label}
+                {g.status === 'playing' ? '・進行中' : g.status === 'finished' ? '・已結束' : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="lobby-select-row">
           <label htmlFor="role-select">角色：</label>
           <select
             id="role-select"
@@ -146,9 +163,13 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
               const isOccupiedByOther = occupant !== null && !isMine;
 
               return (
-                <option key={role.id} value={role.id} disabled={isOccupiedByOther}>
+                <option
+                  key={role.id}
+                  value={role.id}
+                  disabled={isOccupiedByOther || (started && !isMine)}
+                >
                   {role.name}
-                  {isMine ?  : isOccupiedByOther ? `（已被 ${occupant} 選擇）` : ''}
+                  {isOccupiedByOther ? `（已被 ${occupant} 選擇）` : ''}
                 </option>
               );
             })}

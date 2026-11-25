@@ -10,7 +10,7 @@
   justify-content: flex-end;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
   font-size: 0.9rem;
   color: var(--text-muted);
 }
@@ -29,7 +29,7 @@
   color: var(--primary);
 }
 
-/* 圓圈頭像與彈出選單 */
+/* 預設灰色人物圓形頭像（無外圈黃框） */
 .profile-menu-wrapper {
   position: relative;
 }
@@ -38,11 +38,9 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--card-bg);
-  border: 1.5px solid var(--primary);
-  color: var(--primary);
-  font-size: 1rem;
-  font-weight: 700;
+  background: #334155;
+  border: none;
+  color: #94a3b8;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -51,8 +49,8 @@
 }
 
 .profile-circle-btn:hover {
-  background: var(--primary);
-  color: #000;
+  background: #475569;
+  color: #f8fafc;
 }
 
 .profile-dropdown {
@@ -127,12 +125,12 @@
 /* 歡迎標題區 */
 .lobby-header {
   text-align: center;
-  margin-top: 2rem;
-  margin-bottom: 2.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 3.25rem;
 }
 
 .lobby-header h1 {
-  font-size: 1.85rem;
+  font-size: 1.9rem;
   color: var(--text);
   margin-bottom: 0.5rem;
 }
@@ -142,13 +140,13 @@
   font-size: 0.95rem;
 }
 
-/* 移除外框的雙下拉選單區 */
+/* 移除外框的雙下拉選單區（拉大上下間距） */
 .group-selection {
   max-width: 380px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 3rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.85rem;
 }
 
 .lobby-select-row {
@@ -259,7 +257,7 @@
   text-decoration: underline;
 }
 
-/* 底部按鈕區 */
+/* 底部按鈕區（縮短按鈕寬度並置中） */
 .lobby-footer {
   max-width: 380px;
   margin: 0 auto;
@@ -270,7 +268,9 @@
 }
 
 .lobby-footer .btn-primary {
-  width: 100%;
+  width: auto;
+  min-width: 180px;
+  padding: 0.85rem 2.25rem;
 }
 
 .ready-text strong {

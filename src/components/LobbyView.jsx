@@ -124,24 +124,6 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
             {model.groups.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.label}
-                {g.id === model.myGameId ? : ''}
-                {g.status === 'playing' ? '・進行中' : g.status === 'finished' ? '・已結束' : ''}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="lobby-select-row">
-          <label htmlFor="group-select">組別：</label>
-          <select
-            id="group-select"
-            value={group.id}
-            onChange={(e) => setSelectedGroupId(e.target.value)}
-            disabled={busy}
-          >
-            {model.groups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.label}
                 {g.status === 'playing' ? '・進行中' : g.status === 'finished' ? '・已結束' : ''}
               </option>
             ))}

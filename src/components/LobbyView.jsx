@@ -59,7 +59,6 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
   };
 
   const handleLogout = async () => {
-    // 遊戲還沒開始就登出 → 順便把位置讓出來，別人才選得到
     const myGroup = model.groups.find((g) => g.id === model.myGameId);
     if (seat && myGroup?.status === 'waiting') {
       try {
@@ -81,8 +80,11 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
             type="button"
             className="profile-circle-btn"
             onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label="個人資訊選單"
           >
-            {nickname.charAt(0).toUpperCase()}
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+            </svg>
           </button>
 
           {menuOpen && (
@@ -105,7 +107,7 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
       </div>
 
       <header className="lobby-header">
-        <h1>{nickname}，歡迎進入 Beer Game</h1>
+        <h1>歡迎進入 Beer Game</h1>
       </header>
 
       {actionError && <div className="error-banner">{actionError}</div>}
@@ -122,7 +124,7 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
             {model.groups.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.label}
-                {g.id === model.myGameId ? '（你在這組）' : ''}
+                {g.id === model.myGameId ?  : ''}
                 {g.status === 'playing' ? '・進行中' : g.status === 'finished' ? '・已結束' : ''}
               </option>
             ))}
@@ -146,7 +148,7 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
               return (
                 <option key={role.id} value={role.id} disabled={isOccupiedByOther}>
                   {role.name}
-                  {isMine ? '（已選擇）' : isOccupiedByOther ? `（已被 ${occupant} 選擇）` : ''}
+                  {isMine ? '' : isOccupiedByOther ? `（已被 ${occupant} 選擇）` : ''}
                 </option>
               );
             })}

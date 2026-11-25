@@ -124,7 +124,7 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
             {model.groups.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.label}
-                {g.id === model.myGameId ?  : ''}
+                {g.id === model.myGameId ? : ''}
                 {g.status === 'playing' ? '・進行中' : g.status === 'finished' ? '・已結束' : ''}
               </option>
             ))}
@@ -148,7 +148,7 @@ export default function LobbyView({ nickname, joinCode, onLogout, onStartGame })
               return (
                 <option key={role.id} value={role.id} disabled={isOccupiedByOther}>
                   {role.name}
-                  {isMine ? '' : isOccupiedByOther ? `（已被 ${occupant} 選擇）` : ''}
+                  {isMine ?  : isOccupiedByOther ? `（已被 ${occupant} 選擇）` : ''}
                 </option>
               );
             })}

@@ -1,4 +1,77 @@
-return (
+import { useState } from 'react';
+import './LobbyView.css';
+import { useLobby } from '../hooks/useLobby.js';
+import { ROLE_INFO } from '../lib/adapters.js';
+
+const ROLES = Object.entries(ROLE_INFO).map(([id, info]) => ({ id, ...info }));
+
+export default function LobbyView({ nickname, joinCode, onLogout, onStartGame }) {
+  const { model, seat, error, loading, claimRole, leaveRole } = useLobby(joinCode, nickname);
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
+  const [actionError, setActionError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  if (loading) {
+    return <div className="lobby-container"><p className="lobby-hint">載入大廳中…</p></div>;
+  }
+  if (!model) {
+    return (
+      <div className="lobby-container">
+        <div className="error-banner">無法載入大廳：{error?.message ?? '未知錯誤'}</div>
+        <button className="logout-btn" onClick={onLogout}>回到登入頁</button>
+      </div>
+    );
+  }
+
+  const group =
+    model.groups.find((g) => g.id === (selectedGroupId ?? model.myGameId)) ?? model.groups[0];
+  const slots = group.slots;
+  const myRole = model.myGameId === group.id ? model.myRole : null;
+  const started = group.status !== 'waiting';
+
+  const act = async (fn) => {
+    setActionError('');
+    setBusy(true);
+    try {
+      await fn();
+    } catch (e) {
+      setActionError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleRoleSelect = (e) => {
+    const roleId = e.target.value;
+    if (busy) return;
+
+    if (!roleId) {
+      if (myRole && !started) {
+        act(() => leaveRole());
+      }
+      return;
+    }
+
+    if (roleId === myRole) return;
+    if (slots[roleId] !== null) return;
+    act(() => claimRole(group.id, roleId));
+  };
+
+  const handleLogout = async () => {
+    // 遊戲還沒開始就登出 → 順便把位置讓出來，別人才選得到
+    const myGroup = model.groups.find((g) => g.id === model.myGameId);
+    if (seat && myGroup?.status === 'waiting') {
+      try {
+        await leaveRole();
+      } catch {
+        /* 讓不出來也照樣登出 */
+      }
+    }
+    onLogout();
+  };
+
+  return (
     <div className="lobby-container">
       <div className="user-bar">
         <span className="brand-logo">Beer Game</span>
@@ -93,3 +166,4 @@ return (
       </div>
     </div>
   );
+}

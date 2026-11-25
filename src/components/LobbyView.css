@@ -10,13 +10,104 @@
   justify-content: flex-end;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
   font-size: 0.9rem;
   color: var(--text-muted);
 }
 
 .user-bar strong {
   color: var(--text);
+}
+
+/* 右上角 Beer Game 藝術字體 */
+.brand-logo {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 1.5px;
+  color: var(--primary);
+}
+
+/* 圓圈頭像與彈出選單 */
+.profile-menu-wrapper {
+  position: relative;
+}
+
+.profile-circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.profile-circle-btn:hover {
+  background: var(--primary);
+  color: #000;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 0.65rem);
+  right: 0;
+  width: 210px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.dropdown-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.dropdown-label {
+  color: var(--text-muted);
+}
+
+.dropdown-value {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.dropdown-divider {
+  border-top: 1px solid var(--border);
+  margin: 0.25rem 0;
+}
+
+.dropdown-logout-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 6px;
+  padding: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dropdown-logout-btn:hover {
+  background: var(--danger);
+  color: #fff;
 }
 
 .logout-btn {
@@ -33,14 +124,16 @@
   border-color: var(--danger);
 }
 
+/* 歡迎標題區 */
 .lobby-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .lobby-header h1 {
-  font-size: 2rem;
-  color: var(--primary);
+  font-size: 1.85rem;
+  color: var(--text);
   margin-bottom: 0.5rem;
 }
 
@@ -49,17 +142,37 @@
   font-size: 0.95rem;
 }
 
+/* 移除外框的雙下拉選單區 */
 .group-selection {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1rem 1.5rem;
+  max-width: 380px;
+  margin: 0 auto 2rem;
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
+.lobby-select-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.lobby-select-row label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  min-width: 3.2rem;
+}
+
+.lobby-select-row select {
+  flex: 1;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* 保留原有關於卡片的 class 避免影響其他引用 */
 .slots-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -146,13 +259,38 @@
   text-decoration: underline;
 }
 
+/* 底部按鈕區 */
 .lobby-footer {
+  max-width: 380px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
 }
 
+.lobby-footer .btn-primary {
+  width: 100%;
+}
+
 .ready-text strong {
   color: var(--primary);
+}
+
+.lobby-hint {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.error-banner {
+  max-width: 380px;
+  margin: 0 auto 1.5rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  text-align: center;
 }
